@@ -14,6 +14,7 @@ class RecipeView extends View {
   addHandlerRender(handler) {
     const events = ['hashchange', 'load'];
     events.forEach(ev => window.addEventListener(ev, handler));
+
   }
 
   _generateMarkup() {
