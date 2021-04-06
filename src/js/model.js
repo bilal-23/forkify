@@ -30,7 +30,8 @@ export const loadRecipe = async function (id) {
             cookingTime: recipe.cooking_time,
             ingredients: recipe.ingredients
         }
-        // console.log(state.recipe);
+
+
     } catch (err) {
         //temp error handling 
         console.error(`${err} error from model.js file`);
@@ -52,6 +53,7 @@ export const loadSearchResults = async function (query) {
             }
 
         })
+
     }
     catch (err) {
         console.error(`${err} error , cannot load search result`);
@@ -66,4 +68,15 @@ export const getSearchResultPage = function (page = 1) {
     const paginationResult = state.search.results.slice(start, end);
     // console.log(paginationResult)
     return paginationResult;
+}
+
+export const updateServings = function (newServings) {
+
+
+    state.recipe.ingredients.forEach(ing => {
+        if (ing.quantity === null) return;
+
+        ing.quantity = ing.quantity / state.recipe.servings * newServings;
+    })
+    state.recipe.servings = newServings;
 }
