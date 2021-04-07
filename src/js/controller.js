@@ -3,6 +3,7 @@ import * as model from './model.js'
 import recipeView from './views/recipeView.js'
 import searchView from './views/searchView.js'
 import ResultView from './views/resultsView.js'
+import bookmarksView from './views/bookmarkView.js'
 import PaginationView from './views/paginationView.js'
 
 import 'core-js/stable'
@@ -31,6 +32,7 @@ const controlRecipe = async function () {
 
     //0 Update results viwe to mark selected search result
     ResultView.update(model.getSearchResultPage())
+    bookmarksView.render(model.state.bookmarks)
 
     //1LOADING REDCIPE
     await model.loadRecipe(id); //this function is an async and therefore we have to await before moving forward
@@ -93,11 +95,24 @@ const conrtolServings = function (newServings) {
   recipeView.update(model.state.recipe)
 }
 
+const controlAddBookmark = function () {
+  // 1) Add / Remove Bookmark
+
+  if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe) //checking if bookmarked value is false or true
+  else model.deleteBookmark(model.state.recipe.id)
+  // 2) Update Recipe View
+  recipeView.update(model.state.recipe);
+
+  // 3) Render Bookmarks
+  bookmarksView.render(model.state.bookmarks)
+}
 
 const init = function () {
   recipeView.addHandlerRender(controlRecipe);
   searchView.addHandlerSearch(controlSeachResults);
   PaginationView.addHandlerClick(controlPagination);
   recipeView.addHandlerServings(conrtolServings);
+  recipeView.addHandlerAddBookmark(controlAddBookmark);
+
 }
 init();
