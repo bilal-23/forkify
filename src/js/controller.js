@@ -29,6 +29,9 @@ const controlRecipe = async function () {
     recipeView.renderSpinner();
 
 
+    //0 Update results viwe to mark selected search result
+    ResultView.update(model.getSearchResultPage())
+
     //1LOADING REDCIPE
     await model.loadRecipe(id); //this function is an async and therefore we have to await before moving forward
 
@@ -86,8 +89,8 @@ const conrtolServings = function (newServings) {
   model.updateServings(newServings);
 
   //Update Recipe View
-  recipeView.render(model.state.recipe)
-
+  // recipeView.render(model.state.recipe)
+  recipeView.update(model.state.recipe)
 }
 
 

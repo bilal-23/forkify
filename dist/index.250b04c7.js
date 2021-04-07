@@ -468,6 +468,8 @@ const controlRecipe = async function () {
     if (!id) return;
     // Render Spinner
     _viewsRecipeViewJsDefault.default.renderSpinner();
+    // 0 Update results viwe to mark selected search result
+    _viewsResultsViewJsDefault.default.update(_modelJs.getSearchResultPage());
     // 1LOADING REDCIPE
     await _modelJs.loadRecipe(id);
     // this function is an async and therefore we have to await before moving forward
@@ -510,7 +512,8 @@ const conrtolServings = function (newServings) {
   // Update Recipe Serving (in state)
   _modelJs.updateServings(newServings);
   // Update Recipe View
-  _viewsRecipeViewJsDefault.default.render(_modelJs.state.recipe);
+  // recipeView.render(model.state.recipe)
+  _viewsRecipeViewJsDefault.default.update(_modelJs.state.recipe);
 };
 const init = function () {
   _viewsRecipeViewJsDefault.default.addHandlerRender(controlRecipe);
@@ -537,6 +540,9 @@ _parcelHelpers.export(exports, "getSearchResultPage", function () {
 });
 _parcelHelpers.export(exports, "updateServings", function () {
   return updateServings;
+});
+_parcelHelpers.export(exports, "addBookmark", function () {
+  return addBookmark;
 });
 require('regenerator-runtime');
 var _configJs = require('./config.js');
@@ -583,6 +589,7 @@ const loadSearchResults = async function (query) {
         image: recipe.image_url
       };
     });
+    state.search.page = 1;
   } catch (err) {
     console.error(`${err} error , cannot load search result`);
     throw err;
@@ -603,6 +610,7 @@ const updateServings = function (newServings) {
   });
   state.recipe.servings = newServings;
 };
+const addBookmark = function (rec) {};
 
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","regenerator-runtime":"62Qib","./config.js":"6pr2F","./helpers.js":"581KF"}],"5gA8y":[function(require,module,exports) {
 "use strict";
@@ -2021,6 +2029,25 @@ class View {
   }
   _clear() {
     this._parentElement.textContent = "";
+  }
+  update(data) {
+    // updating only those elements which are different from the old one.
+    this._data = data;
+    const newMarkup = this._generateMarkup();
+    const newDom = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(newDom.querySelectorAll('*'));
+    const curElements = Array.from(this._parentElement.querySelectorAll('*'));
+    newElements.forEach((newEl, i) => {
+      const curEl = curElements[i];
+      // update change text
+      if (!newEl.isEqualNode(curEl) && newEl.firstChild?.nodeValue?.trim?.() !== "") {
+        curEl.textContent = newEl.textContent;
+      }
+      // changing attributes of newEl
+      if (!newEl.isEqualNode(curEl)) {
+        Array.from(newEl.attributes).forEach(attr => curEl.setAttribute(attr.name, attr.value));
+      }
+    });
   }
   renderSpinner() {
     const markup = `
@@ -13297,9 +13324,10 @@ class ResultView extends _viewJsDefault.default {
     }).join('');
   }
   _generateMarkupPreview(rec) {
+    const id = window.location.hash.slice(1);
     return `
         <li class="preview">
-         <a class="preview__link " href="#${rec.id}">
+         <a class="preview__link ${rec.id === id ? 'preview__link--active' : ''} " href="#${rec.id} ">
           <figure class="preview__fig">
             <img src="${rec.image}" alt="${rec.title}" />
           </figure>

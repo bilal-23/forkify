@@ -50,9 +50,9 @@ export const loadSearchResults = async function (query) {
                 title: recipe.title,
                 publisher: recipe.publisher,
                 image: recipe.image_url,
-            }
+            };
 
-        })
+        }); state.search.page = 1;
 
     }
     catch (err) {
@@ -79,4 +79,8 @@ export const updateServings = function (newServings) {
         ing.quantity = ing.quantity / state.recipe.servings * newServings;
     })
     state.recipe.servings = newServings;
+}
+
+export const addBookmark = function (rec) {
+
 }
