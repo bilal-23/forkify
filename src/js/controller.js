@@ -11,6 +11,7 @@ import { MODAL_CLOSE_SEC } from './config.js'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import paginationView from './views/paginationView.js'
+import bookmarkView from './views/bookmarkView.js'
 
 //polyfilling everything else
 //pollyfiling async await
@@ -128,6 +129,11 @@ const controlAddRecipe = async function (newRecipe) {
 
     //Succes message 
     addRecipeView.renderMessage()
+
+    bookmarkView.render(model.state.bookmarks);
+
+    //change id in the url
+    window.history.pushState(null, '', `#${model.state.recipe.id}`)
 
     //close form window
     setTimeout(() => {
