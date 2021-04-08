@@ -5,6 +5,8 @@ import searchView from './views/searchView.js'
 import ResultView from './views/resultsView.js'
 import bookmarksView from './views/bookmarkView.js'
 import PaginationView from './views/paginationView.js'
+import addRecipeView from './views/addRecipeView.js'
+import { MODAL_CLOSE_SEC } from './config.js'
 
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
@@ -28,17 +30,20 @@ const controlRecipe = async function () {
 
     //Render Spinner
     recipeView.renderSpinner();
+    //UPdate bookmark
+
 
 
     //0 Update results viwe to mark selected search result
     ResultView.update(model.getSearchResultPage())
-    bookmarksView.render(model.state.bookmarks)
 
     //1LOADING REDCIPE
     await model.loadRecipe(id); //this function is an async and therefore we have to await before moving forward
 
     //2 RENDERING RECIPE
     recipeView.render(model.state.recipe)
+    //UPdate bookmark
+    bookmarksView.update(model.state.bookmarks)
 
 
 
@@ -107,12 +112,41 @@ const controlAddBookmark = function () {
   bookmarksView.render(model.state.bookmarks)
 }
 
+const controlBookmarks = function () {
+  bookmarksView.render(model.state.bookmarks)
+}
+
+const controlAddRecipe = async function (newRecipe) {
+  try {
+    //render spinner
+    addRecipeView.renderSpinner();
+
+    await model.uploadRecipe(newRecipe)
+    console.log(model.state.recipe)
+    //render recipe
+    recipeView.render(model.state.recipe);
+
+    //Succes message 
+    addRecipeView.renderMessage()
+
+    //close form window
+    setTimeout(() => {
+      addRecipeView.toggleWindow()
+    }, MODAL_CLOSE_SEC * 1000)
+  }
+  catch (err) {
+    console.log(err, '!!!!!')
+    addRecipeView.renderError(err)
+  }
+}
+
 const init = function () {
   recipeView.addHandlerRender(controlRecipe);
   searchView.addHandlerSearch(controlSeachResults);
   PaginationView.addHandlerClick(controlPagination);
   recipeView.addHandlerServings(conrtolServings);
   recipeView.addHandlerAddBookmark(controlAddBookmark);
-
+  bookmarksView.addRenderHandler(controlBookmarks)
+  addRecipeView._addHandlerUpload(controlAddRecipe)
 }
 init();
